@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+*.so
+*.dylib
+.Python
+.venv/
+venv/
+.env
+dist/
+build/
+*.egg-info/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+site/
+target/
+*.onnx.bak
+
+# Native extension build artifacts (maturin develop)
+**/*.dSYM/
+python/edgeadapt/_edgeadapt_core*.so
+python/edgeadapt/_edgeadapt_core*.dylib

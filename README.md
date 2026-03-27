@@ -1,6 +1,6 @@
 # EdgeAdapt
 
-[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+[![CI](https://github.com/thatrandomasiandev/EdgeAdapt/actions/workflows/ci.yml/badge.svg)](https://github.com/thatrandomasiandev/EdgeAdapt/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 **EdgeAdapt** (working name *openedlib*) is an open-source Python + Rust library that selects among registered ML model variants at runtime based on device constraints (battery, thermals, memory, latency budgets) and hot-swaps the active model without blocking inference.

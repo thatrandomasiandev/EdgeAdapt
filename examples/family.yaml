@@ -1,0 +1,30 @@
+schema_version: 1
+family: object_detection
+variants:
+  full:
+    path: ../benchmarks/sample_models/dummy_high.onnx
+    tier: high
+    backend: onnx
+    metadata:
+      expected_latency_ms: 120
+      memory_footprint_mb: 250
+      accuracy_score: 0.92
+      power_draw_estimate: high
+  quantized:
+    path: ../benchmarks/sample_models/dummy_medium.onnx
+    tier: medium
+    backend: onnx
+    metadata:
+      expected_latency_ms: 45
+      memory_footprint_mb: 80
+      accuracy_score: 0.87
+      power_draw_estimate: medium
+  tiny:
+    path: ../benchmarks/sample_models/dummy_low.onnx
+    tier: low
+    backend: onnx
+    metadata:
+      expected_latency_ms: 15
+      memory_footprint_mb: 20
+      accuracy_score: 0.74
+      power_draw_estimate: low

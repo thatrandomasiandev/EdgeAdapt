@@ -1,0 +1,59 @@
+[build-system]
+requires = ["maturin>=1.4,<2"]
+build-backend = "maturin"
+
+[project]
+name = "edgeadapt"
+version = "0.1.0"
+description = "Runtime ML model variant selection and hot-swap for edge devices."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+authors = [{ name = "EdgeAdapt contributors" }]
+keywords = ["ml", "onnx", "edge", "inference", "adaptive"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Rust",
+  "License :: OSI Approved :: Apache Software License",
+]
+
+dependencies = [
+  "onnxruntime>=1.16.0",
+  "pyyaml>=6.0",
+  "click>=8.1.0",
+  "psutil>=5.9.0",
+  "numpy>=1.24.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "maturin>=1.4,<2",
+  "pytest>=7.4.0",
+  "hypothesis>=6.92.0",
+  "ruff>=0.4.0",
+  "mkdocs-material>=9.5.0",
+  "onnx>=1.14.0",
+]
+
+[project.scripts]
+edgeadapt = "edgeadapt.cli.main:main"
+
+[tool.maturin]
+manifest-path = "rust/edgeadapt_core/Cargo.toml"
+python-source = "python"
+module-name = "edgeadapt._edgeadapt_core"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+src = ["python", "tests/python"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]
+pythonpath = ["python"]

@@ -1,0 +1,26 @@
+site_name: EdgeAdapt
+site_description: Adaptive ML model selection and hot-swap for edge devices
+docs_dir: .
+site_dir: ../site
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+nav:
+  - Home: index.md
+  - Quickstart: quickstart.md
+  - Architecture: architecture.md
+  - Platform scope: platform.md
+  - Roadmap: roadmap.md
+  - Policies: policies.md
+  - Contributing: contributing.md
+  - API reference: api_reference.md
