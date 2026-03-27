@@ -38,6 +38,12 @@ class BasePolicy(ABC):
     def select(self, state: DeviceState, family: ModelFamily) -> str:
         """Return the variant name to use."""
 
+    def select_with_explanation(
+        self, state: DeviceState, family: ModelFamily
+    ) -> tuple[str, dict[str, object]]:
+        """Return ``(variant_name, explanation_dict)`` for observability and debugging."""
+        return self.select(state, family), {}
+
     def should_swap(
         self,
         current: str,
@@ -60,3 +66,10 @@ class LambdaPolicy(BasePolicy):
     def select(self, state: DeviceState, family: ModelFamily) -> str:
         """Delegate to the wrapped callable."""
         return self._fn(state, family)
+
+    def select_with_explanation(
+        self, state: DeviceState, family: ModelFamily
+    ) -> tuple[str, dict[str, object]]:
+        """Include the callable's ``__name__`` when available."""
+        name = getattr(self._fn, "__name__", "lambda")
+        return self._fn(state, family), {"policy": "LambdaPolicy", "callable": name}

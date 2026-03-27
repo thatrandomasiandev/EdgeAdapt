@@ -28,16 +28,47 @@ class MaximizeAccuracy(BasePolicy):
 
     def select(self, state: DeviceState, family: ModelFamily) -> str:
         """Sort by descending accuracy and pick the first feasible variant."""
+        chosen, _ = self.select_with_explanation(state, family)
+        return chosen
+
+    def select_with_explanation(
+        self, state: DeviceState, family: ModelFamily
+    ) -> tuple[str, dict[str, object]]:
+        """Include feasibility and ranking for each variant."""
         variants = list(family.variants.values())
         variants.sort(key=lambda x: x.metadata.accuracy_score, reverse=True)
+        ranked: list[dict[str, object]] = []
+        for v in variants:
+            ok = _fits_resources(
+                v,
+                available_ram_mb=state.available_ram_mb,
+                latency_ceiling_ms=self._latency_ceiling_ms,
+            )
+            ranked.append(
+                {
+                    "name": v.name,
+                    "accuracy": v.metadata.accuracy_score,
+                    "feasible": ok,
+                }
+            )
         for v in variants:
             if _fits_resources(
                 v,
                 available_ram_mb=state.available_ram_mb,
                 latency_ceiling_ms=self._latency_ceiling_ms,
             ):
-                return v.name
-        return variants[0].name if variants else next(iter(family.variants.keys()))
+                return v.name, {
+                    "policy": "MaximizeAccuracy",
+                    "latency_ceiling_ms": self._latency_ceiling_ms,
+                    "ranked_variants": ranked,
+                }
+        fallback = variants[0].name if variants else next(iter(family.variants.keys()))
+        return fallback, {
+            "policy": "MaximizeAccuracy",
+            "latency_ceiling_ms": self._latency_ceiling_ms,
+            "ranked_variants": ranked,
+            "note": "no feasible variant; using fallback",
+        }
 
 
 class MinimizePower(BasePolicy):
@@ -50,6 +81,13 @@ class MinimizePower(BasePolicy):
 
     def select(self, state: DeviceState, family: ModelFamily) -> str:
         """Sort by ascending power draw and pick the first above the accuracy floor."""
+        chosen, _ = self.select_with_explanation(state, family)
+        return chosen
+
+    def select_with_explanation(
+        self, state: DeviceState, family: ModelFamily
+    ) -> tuple[str, dict[str, object]]:
+        """Include accuracy floor and power ordering."""
         _ = state
         variants = [
             v
@@ -59,7 +97,12 @@ class MinimizePower(BasePolicy):
         if not variants:
             variants = list(family.variants.values())
         variants.sort(key=lambda x: _POWER_ORDER.get(x.metadata.power_draw_estimate, 99))
-        return variants[0].name
+        names = [v.name for v in variants]
+        return variants[0].name, {
+            "policy": "MinimizePower",
+            "min_accuracy_floor": self._min_accuracy_floor,
+            "candidates_ordered": names,
+        }
 
 
 class Balanced(BasePolicy):
@@ -85,9 +128,17 @@ class Balanced(BasePolicy):
 
     def select(self, state: DeviceState, family: ModelFamily) -> str:
         """Pick the highest composite score among feasible variants."""
+        chosen, _ = self.select_with_explanation(state, family)
+        return chosen
+
+    def select_with_explanation(
+        self, state: DeviceState, family: ModelFamily
+    ) -> tuple[str, dict[str, object]]:
+        """Return composite scores per feasible variant."""
         best_name: str | None = None
         best_score = float("-inf")
         n = max(1, len(family.variants))
+        scores: dict[str, float] = {}
         for v in family.variants.values():
             if not _fits_resources(
                 v,
@@ -104,9 +155,19 @@ class Balanced(BasePolicy):
                 + self._w_lat * lat_term
                 + self._w_pwr * pwr_term
             )
+            scores[v.name] = score
             if score > best_score:
                 best_score = score
                 best_name = v.name
         if best_name is not None:
-            return best_name
-        return next(iter(family.variants.keys()))
+            return best_name, {
+                "policy": "Balanced",
+                "weights": {"acc": self._w_acc, "lat": self._w_lat, "pwr": self._w_pwr},
+                "composite_scores": scores,
+            }
+        fb = next(iter(family.variants.keys()))
+        return fb, {
+            "policy": "Balanced",
+            "composite_scores": scores,
+            "note": "no feasible variant; fallback to arbitrary",
+        }

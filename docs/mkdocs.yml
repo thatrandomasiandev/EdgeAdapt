@@ -21,6 +21,9 @@ nav:
   - Architecture: architecture.md
   - Platform scope: platform.md
   - Roadmap: roadmap.md
+  - Gap analysis: gap_analysis.md
+  - Swap lifecycle: swap_lifecycle.md
+  - Benchmarking: benchmarking.md
   - Policies: policies.md
   - Contributing: contributing.md
   - API reference: api_reference.md

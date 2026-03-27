@@ -25,3 +25,15 @@ def test_bad_path_raises() -> None:
     b = ONNXBackend()
     with pytest.raises(OSError):
         b.load("/nonexistent/model.onnx")
+
+
+def test_capabilities_after_load(dummy_model_paths: dict[str, object]) -> None:
+    """ONNX backend reports capability descriptor."""
+    path = str(dummy_model_paths["low"])
+    b = ONNXBackend()
+    b.load(path)
+    cap = b.capabilities()
+    assert cap.backend_id == "onnxruntime"
+    assert cap.supports_concurrent_infer is True
+    assert len(cap.input_names) >= 1
+    assert b.last_load_time_sec is not None and b.last_load_time_sec >= 0.0

@@ -94,6 +94,7 @@ impl HotSwapper {
                             }
                         }
                         Err(err) => {
+                            // Do not mutate `active_backend` or `current_variant` — last-known-good serves.
                             if let Some(cb) = &on_fallback {
                                 let msg = format!("{err}");
                                 let _ = cb.call1(py, (variant.as_str(), msg));

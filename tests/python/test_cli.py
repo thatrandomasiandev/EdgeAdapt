@@ -55,3 +55,29 @@ variants:
     runner = CliRunner()
     r = runner.invoke(main, ["validate", "--config", str(p)])
     assert r.exit_code == 0
+
+
+def test_benchmark_json(tmp_path: Path, dummy_model_paths: dict[str, object]) -> None:
+    """benchmark --json emits BenchmarkReport v2 structure."""
+    p = tmp_path / "f.yaml"
+    p.write_text(
+        f"""
+family: bench
+variants:
+  a:
+    path: {dummy_model_paths["low"]}
+    tier: high
+    backend: onnx
+    metadata:
+      expected_latency_ms: 1
+      memory_footprint_mb: 1
+      accuracy_score: 0.5
+      power_draw_estimate: low
+""",
+        encoding="utf-8",
+    )
+    runner = CliRunner()
+    r = runner.invoke(main, ["benchmark", "--config", str(p), "--runs", "5", "--json"])
+    assert r.exit_code == 0
+    assert "latency_ms_p50" in r.output
+    assert "metadata" in r.output

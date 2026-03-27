@@ -33,6 +33,12 @@ class StabilityGuard(BasePolicy):
         """Return the recommended variant from the inner policy."""
         return self._inner.select(state, family)
 
+    def select_with_explanation(
+        self, state: DeviceState, family: ModelFamily
+    ) -> tuple[str, dict[str, object]]:
+        """Delegate to the inner policy's explanation hook."""
+        return self._inner.select_with_explanation(state, family)
+
     def should_swap(
         self,
         current: str,

@@ -30,4 +30,4 @@ The path to “OpenCV-level completeness” for this *category* of library is a 
 
 - Implementing a custom **graph executor**, **large operator coverage**, or **replacing ONNX Runtime**—those are separate products. EdgeAdapt should integrate and compose them, not duplicate them.
 
-For a deeper discussion of scope, see [Platform scope](platform.md).
+For a deeper discussion of scope, see [Platform scope](platform.md). For a checklist of what is **done vs roadmap** in the repo today, see [Gap analysis](gap_analysis.md).
